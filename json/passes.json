@@ -1,0 +1,62 @@
+[
+    {
+        "owner": "user A",
+        "gym": "FB",
+        "qty": 5,
+        "cost": 20,
+        "date_purchased": {
+            "$date": "2024-06-01T10:00:00Z"
+        },
+        "date_expiry": {
+            "$date": "2025-06-01T10:00:00Z"
+        }
+    },
+    {
+        "owner": "user A",
+        "gym": "BM",
+        "qty": 1,
+        "cost": 15,
+        "date_purchased": {
+            "$date": "2024-06-01T10:00:00Z"
+        },
+        "date_expiry": {
+            "$date": "2025-06-01T10:00:00Z"
+        }
+    },
+    {
+        "owner": "user B",
+        "gym": "ZV",
+        "qty": 10,
+        "cost": 23.5,
+        "date_purchased": {
+            "$date": "2024-06-01T10:00:00Z"
+        },
+        "date_expiry": {
+            "$date": "2025-06-01T10:00:00Z"
+        }
+    },
+    {
+        "owner": "user B",
+        "gym": "B+",
+        "qty": 8,
+        "cost": 18,
+        "date_purchased": {
+            "$date": "2024-06-01T10:00:00Z"
+        },
+        "date_expiry": {
+            "$date": "2025-06-01T10:00:00Z"
+        }
+    },
+    {
+        "owner": "user C",
+        "gym": "BM",
+        "qty": 5,
+        "cost": 15,
+        "date_purchased": {
+            "$date": "2024-06-01T10:00:00Z"
+        },
+        "date_expiry": {
+            "$date": "2025-06-01T10:00:00Z"
+        }
+    }
+]
