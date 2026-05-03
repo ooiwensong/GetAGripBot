@@ -23,9 +23,10 @@ func (a *App) init() {
 	ps := pass.NewPassService(db)
 	gs := gym.NewGymService(db)
 
-	a.bot.RegisterHandler(bot.HandlerTypeMessageText, "gyms", bot.MatchTypeCommand, gs.GetGymsHandler())
-	a.bot.RegisterHandler(bot.HandlerTypeMessageText, "passes", bot.MatchTypeCommand, ps.GetPassesByOwnerHandler())
-	a.bot.RegisterHandler(bot.HandlerTypeMessageText, "register", bot.MatchTypeCommand, us.GetRegisterUserHandler())
+	a.bot.RegisterHandler(bot.HandlerTypeMessageText, "gyms", bot.MatchTypeCommand, gs.GymsHandlerFunc())
+	a.bot.RegisterHandler(bot.HandlerTypeMessageText, "who", bot.MatchTypeCommand, ps.PassesByOwnerHandlerFunc())
+	a.bot.RegisterHandler(bot.HandlerTypeMessageText, "where", bot.MatchTypeCommand, ps.PassByGymsHandlerFunc())
+	a.bot.RegisterHandler(bot.HandlerTypeMessageText, "register", bot.MatchTypeCommand, us.RegisterUserHandlerFunc())
 }
 
 func (a *App) start(ctx context.Context) {

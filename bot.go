@@ -39,7 +39,8 @@ func defaultHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 func helpHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	helpText := "Available commands:\n\n" +
 		"/gyms - List all gyms and their pass validity\n" +
-		"/passes - List all available passes sorted by owner\n" +
+		"/who - List all available passes sorted by owner\n" +
+		"/where - List all available passes sorted by gym\n" +
 		"/register - Register yourself with the bot\n"
 
 	b.SendMessage(ctx, &bot.SendMessageParams{

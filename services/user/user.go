@@ -23,7 +23,7 @@ func NewUserService(db *mongo.Database) *UserService {
 	return &UserService{db: db}
 }
 
-func (s *UserService) GetRegisterUserHandler() bot.HandlerFunc {
+func (s *UserService) RegisterUserHandlerFunc() bot.HandlerFunc {
 
 	db := s.db
 	return func(ctx context.Context, b *bot.Bot, update *models.Update) {

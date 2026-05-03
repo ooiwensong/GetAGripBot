@@ -27,7 +27,7 @@ func NewGymService(db *mongo.Database) *GymService {
 	return &GymService{db: db}
 }
 
-func (s *GymService) GetGymsHandler() bot.HandlerFunc {
+func (s *GymService) GymsHandlerFunc() bot.HandlerFunc {
 	db := s.db
 	return func(ctx context.Context, b *bot.Bot, update *models.Update) {
 		var results []Gym
@@ -52,7 +52,11 @@ func (s *GymService) GetGymsHandler() bot.HandlerFunc {
 		var response strings.Builder
 		fmt.Fprint(&response, "<b>Gyms:</b>\n")
 		for _, gym := range results {
-			fmt.Fprintf(&response, "\n%s\n\n    Validity:%d months\n", gym.NameShort, gym.PassValidity)
+			fmt.Fprintf(&response, "\n%s:\n", gym.Name)
+			if gym.Typ != "" {
+				fmt.Fprintf(&response, "    - Type: %s\n", gym.Typ)
+			}
+			fmt.Fprintf(&response, "    - Cost: $%0.2f\n    - Validity: %d months\n", gym.Cost, gym.PassValidity)
 		}
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:    update.Message.Chat.ID,
