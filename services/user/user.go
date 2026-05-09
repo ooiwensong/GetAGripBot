@@ -11,7 +11,7 @@ import (
 )
 
 type User struct {
-	ID       uint64 `bson:"_id"`
+	ID       int64  `bson:"_id"`
 	Username string `bson:"username"`
 }
 

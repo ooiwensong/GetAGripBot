@@ -27,6 +27,12 @@ func (a *App) init() {
 	a.bot.RegisterHandler(bot.HandlerTypeMessageText, "who", bot.MatchTypeCommand, ps.PassesByOwnerHandlerFunc())
 	a.bot.RegisterHandler(bot.HandlerTypeMessageText, "where", bot.MatchTypeCommand, ps.PassByGymsHandlerFunc())
 	a.bot.RegisterHandler(bot.HandlerTypeMessageText, "register", bot.MatchTypeCommand, us.RegisterUserHandlerFunc())
+	a.bot.RegisterHandler(bot.HandlerTypeMessageText, "mooch", bot.MatchTypeCommand, ps.UsePassHandlerFunc())
+	a.bot.RegisterHandler(bot.HandlerTypeMessageText, "buy", bot.MatchTypeCommand, ps.BuyPassHandlerFunc())
+
+	a.bot.RegisterHandler(bot.HandlerTypeCallbackQueryData, "use_gym", bot.MatchTypePrefix, ps.UseGymCallbackHandlerFunc())
+	a.bot.RegisterHandler(bot.HandlerTypeCallbackQueryData, "use_pass", bot.MatchTypePrefix, ps.UsePassCallbackHandlerFunc())
+	a.bot.RegisterHandler(bot.HandlerTypeCallbackQueryData, "buy_pass", bot.MatchTypePrefix, ps.BuyPassCallbackHandlerFunc())
 }
 
 func (a *App) start(ctx context.Context) {

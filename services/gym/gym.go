@@ -8,15 +8,17 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Gym struct {
-	Name         string  `bson:"name"`
-	NameShort    string  `bson:"name_short"`
-	Typ          string  `bson:"type,omitempty"`
-	PassValidity int32   `bson:"pass_validity"`
-	Cost         float64 `bson:"cost"`
+	ID           primitive.ObjectID `bson:"_id,omitempty"`
+	Name         string             `bson:"name"`
+	NameShort    string             `bson:"name_short"`
+	Typ          int8               `bson:"type,omitempty"`
+	PassValidity int8               `bson:"pass_validity"`
+	Cost         float64            `bson:"cost"`
 }
 
 type GymService struct {
@@ -53,10 +55,7 @@ func (s *GymService) GymsHandlerFunc() bot.HandlerFunc {
 		fmt.Fprint(&response, "<b>Gyms:</b>\n")
 		for _, gym := range results {
 			fmt.Fprintf(&response, "\n%s:\n", gym.Name)
-			if gym.Typ != "" {
-				fmt.Fprintf(&response, "    - Type: %s\n", gym.Typ)
-			}
-			fmt.Fprintf(&response, "    - Cost: $%0.2f\n    - Validity: %d months\n", gym.Cost, gym.PassValidity)
+			fmt.Fprintf(&response, "    -Type: %d passes\n    - Cost: $%0.2f\n    - Validity: %d months\n", gym.Typ, gym.Cost, gym.PassValidity)
 		}
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:    update.Message.Chat.ID,
