@@ -32,11 +32,3 @@ func main() {
 	app.start(ctx)
 	defer app.Stop(ctx)
 }
-
-// func handler(ctx context.Context, b *bot.Bot, update *models.Update) {
-// 	b.SendMessage(ctx, &bot.SendMessageParams{
-// 		ChatID:    update.Message.Chat.ID,
-// 		Text:      fmt.Sprintf("%s sent: %s", update.Message.From.Username, update.Message.Text),
-// 		ParseMode: models.ParseModeHTML,
-// 	})
-// }

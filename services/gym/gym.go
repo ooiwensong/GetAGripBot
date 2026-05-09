@@ -55,7 +55,7 @@ func (s *GymService) GymsHandlerFunc() bot.HandlerFunc {
 		fmt.Fprint(&response, "<b>Gyms:</b>\n")
 		for _, gym := range results {
 			fmt.Fprintf(&response, "\n%s:\n", gym.Name)
-			fmt.Fprintf(&response, "    -Type: %d passes\n    - Cost: $%0.2f\n    - Validity: %d months\n", gym.Typ, gym.Cost, gym.PassValidity)
+			fmt.Fprintf(&response, "    - Type: %d passes\n    - Cost: $%0.2f\n    - Validity: %d months\n", gym.Typ, gym.Cost, gym.PassValidity)
 		}
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:    update.Message.Chat.ID,

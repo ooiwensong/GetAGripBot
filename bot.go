@@ -14,7 +14,6 @@ func newBot() (*bot.Bot, error) {
 
 	opts := []bot.Option{
 		bot.WithSkipGetMe(),
-		bot.WithDebug(),
 		bot.WithDefaultHandler(defaultHandler),
 		bot.WithMessageTextHandler("help", bot.MatchTypeCommand, helpHandler),
 	}
@@ -38,11 +37,12 @@ func defaultHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 
 func helpHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	helpText := "Available commands:\n\n" +
-		"/gyms - List all gyms and their pass validity\n" +
+		"/mooch - Mooch off a pass from someone\n" +
+		"/buy - Buy passes from a gym\n" +
 		"/who - List all available passes sorted by owner\n" +
 		"/where - List all available passes sorted by gym\n" +
-		"/mooch - Mooch off a pass from someone\n" +
-		"/register - Register yourself with the bot\n"
+		"/register - Register yourself with the bot\n" +
+		"/gyms - List all gyms and their pass validity\n"
 
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: update.Message.Chat.ID,

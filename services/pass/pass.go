@@ -145,7 +145,7 @@ func (s *PassService) PassByGymsHandlerFunc() bot.HandlerFunc {
 				}},
 			}}},
 
-			{{Key: "$sort", Value: bson.D{{Key: "_id", Value: 1}}}},
+			{{Key: "$sort", Value: bson.D{{Key: "gym", Value: 1}}}},
 
 			{{Key: "$project", Value: bson.D{
 				{Key: "gym", Value: "$gym"},
@@ -172,7 +172,6 @@ func (s *PassService) PassByGymsHandlerFunc() bot.HandlerFunc {
 			})
 			return
 		}
-		fmt.Printf("%v", results)
 
 		var response strings.Builder
 		fmt.Fprint(&response, "<b>Passes (sorted by gym):</b>\n")
@@ -505,7 +504,7 @@ func (s *PassService) UsePassCallbackHandlerFunc() bot.HandlerFunc {
 }
 
 func (s *PassService) BuyPassCallbackHandlerFunc() bot.HandlerFunc {
-	// db := s.db
+	db := s.db
 	return func(ctx context.Context, b *bot.Bot, update *models.Update) {
 		b.AnswerCallbackQuery(ctx, &bot.AnswerCallbackQueryParams{
 			CallbackQueryID: update.CallbackQuery.ID,
@@ -526,7 +525,7 @@ func (s *PassService) BuyPassCallbackHandlerFunc() bot.HandlerFunc {
 		}
 
 		var gym gym.Gym
-		collection := s.db.Collection("gyms")
+		collection := db.Collection("gyms")
 		err = collection.FindOne(ctx, bson.M{"_id": gymObjID}).Decode(&gym)
 		if err != nil {
 			log.Printf("Error finding gym: %v", err)
@@ -546,7 +545,7 @@ func (s *PassService) BuyPassCallbackHandlerFunc() bot.HandlerFunc {
 			DatePurchased: today,
 			DateExpiry:    today.AddDate(0, int(gym.PassValidity), 0),
 		}
-		passCollection := s.db.Collection("passes")
+		passCollection := db.Collection("passes")
 		_, err = passCollection.InsertOne(ctx, newPass)
 		if err != nil {
 			log.Printf("Error inserting pass: %v", err)
