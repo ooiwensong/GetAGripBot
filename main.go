@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -19,6 +20,7 @@ func main() {
 		port = "8080"
 	}
 	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+		log.Print("Received keep-alive ping.")
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w, "OK")
 	})
