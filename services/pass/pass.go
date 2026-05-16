@@ -537,6 +537,7 @@ func (s *PassService) BuyPassCallbackHandlerFunc() bot.HandlerFunc {
 		}
 
 		ownerID := update.CallbackQuery.From.ID
+		ownerUsername := update.CallbackQuery.From.Username
 		today := today()
 		newPass := Pass{
 			OwnerID:       ownerID,
@@ -558,7 +559,7 @@ func (s *PassService) BuyPassCallbackHandlerFunc() bot.HandlerFunc {
 
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: update.CallbackQuery.Message.Message.Chat.ID,
-			Text:   "Done!",
+			Text:   fmt.Sprintf("Done! %s bought passes from %s", ownerUsername, gym.NameShort),
 		})
 	}
 }
