@@ -42,7 +42,8 @@ func helpHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 		"/who - List all available passes sorted by owner\n" +
 		"/where - List all available passes sorted by gym\n" +
 		"/register - Register yourself with the bot\n" +
-		"/gyms - List all gyms and their pass validity\n"
+		"/gyms - List all gyms and their pass validity\n" +
+		"/undo - Undo the last transaction (buy or use)"
 
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: update.Message.Chat.ID,
