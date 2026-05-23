@@ -10,10 +10,10 @@ import (
 )
 
 type Transaction struct {
-	ID        primitive.ObjectID `bson:"_id"`
-	Action    Action             `bson:"action"`
-	CreatedAt time.Time          `bson:"created_at"`
-	Payload   primitive.ObjectID `bson:"payload"` // Payload can be the PassID for both buy and use actions
+	ID        primitive.ObjectID `bson:"_id,omitempty"`
+	Action    Action             `bson:"action,omitempty"`
+	CreatedAt time.Time          `bson:"created_at,omitempty"`
+	Payload   primitive.ObjectID `bson:"payload,omitempty"` // Payload can be the PassID for both buy and use actions
 }
 
 type Action string
