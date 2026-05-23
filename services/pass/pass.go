@@ -10,6 +10,7 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"github.com/ooiwensong/GetAGripBot/services/gym"
+	"github.com/ooiwensong/GetAGripBot/services/transaction"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -500,6 +501,9 @@ func (s *PassService) UsePassCallbackHandlerFunc() bot.HandlerFunc {
 			ChatID: update.CallbackQuery.Message.Message.Chat.ID,
 			Text:   fmt.Sprintf("1 pass used. %d remaining.", updatedPass.Qty),
 		})
+
+		newTransaction := transaction.NewTransaction(transaction.Use, updatedPass.ID)
+		newTransaction.Save(ctx, db)
 	}
 }
 
@@ -561,6 +565,9 @@ func (s *PassService) BuyPassCallbackHandlerFunc() bot.HandlerFunc {
 			ChatID: update.CallbackQuery.Message.Message.Chat.ID,
 			Text:   fmt.Sprintf("Done! %s bought passes from %s", ownerUsername, gym.NameShort),
 		})
+
+		newTransaction := transaction.NewTransaction(transaction.Buy, newPass.ID)
+		newTransaction.Save(ctx, db)
 	}
 }
 
