@@ -543,7 +543,9 @@ func (s *PassService) BuyPassCallbackHandlerFunc() bot.HandlerFunc {
 		ownerID := update.CallbackQuery.From.ID
 		ownerUsername := update.CallbackQuery.From.Username
 		today := today()
+		passID := primitive.NewObjectID()
 		newPass := Pass{
+			ID:            passID,
 			OwnerID:       ownerID,
 			GymID:         gymObjID,
 			Qty:           gym.Typ,
@@ -566,7 +568,7 @@ func (s *PassService) BuyPassCallbackHandlerFunc() bot.HandlerFunc {
 			Text:   fmt.Sprintf("Done! %s bought passes from %s", ownerUsername, gym.NameShort),
 		})
 
-		newTransaction := transaction.NewTransaction(transaction.Buy, newPass.ID)
+		newTransaction := transaction.NewTransaction(transaction.Buy, passID)
 		newTransaction.Save(ctx, db)
 	}
 }
