@@ -33,7 +33,11 @@ func NewTransaction(action Action, payload primitive.ObjectID) Transaction {
 
 func (t *Transaction) Save(ctx context.Context, db *mongo.Database) error {
 	collection := db.Collection("transactions")
-	_, err := collection.InsertOne(ctx, t)
+	_, err := collection.InsertOne(ctx, bson.M{
+		"action":     t.Action,
+		"created_at": t.CreatedAt,
+		"payload":    t.Payload,
+	})
 	return err
 }
 
