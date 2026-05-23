@@ -60,7 +60,7 @@ func (s *UndoService) UndoHandlerFunc() bot.HandlerFunc {
 		case Use:
 			// Undo use: increase the pass count back
 			collection := db.Collection("passes")
-			_, err = collection.UpdateOne(ctx, bson.M{"_id": lastTransaction.Payload}, bson.M{"$inc": bson.M{"count": 1}})
+			_, err = collection.UpdateOne(ctx, bson.M{"_id": lastTransaction.Payload}, bson.M{"$inc": bson.M{"qty": 1}})
 			if err != nil {
 				b.SendMessage(ctx, &bot.SendMessageParams{
 					ChatID: update.Message.Chat.ID,

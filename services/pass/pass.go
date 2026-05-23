@@ -53,9 +53,11 @@ func (s *PassService) PassesByOwnerHandlerFunc() bot.HandlerFunc {
 	return func(ctx context.Context, b *bot.Bot, update *models.Update) {
 		collection := db.Collection("passes")
 
-		lookupPipeline := getLookupPipeline()
+		matchStage := getMatchPipeline()
+		lookupStage := getLookupPipeline()
 
-		pipeline := append(lookupPipeline, mongo.Pipeline{
+		pipeline := append(matchStage, lookupStage...)
+		pipeline = append(pipeline, mongo.Pipeline{
 			{{Key: "$sort", Value: bson.D{
 				{Key: "username", Value: 1},
 				{Key: "gym_name", Value: 1},
@@ -125,9 +127,11 @@ func (s *PassService) PassByGymsHandlerFunc() bot.HandlerFunc {
 	return func(ctx context.Context, b *bot.Bot, update *models.Update) {
 		collection := db.Collection("passes")
 
+		matchStage := getMatchPipeline()
 		lookupStage := getLookupPipeline()
 
-		pipeline := append(lookupStage, mongo.Pipeline{
+		pipeline := append(matchStage, lookupStage...)
+		pipeline = append(pipeline, mongo.Pipeline{
 			{{Key: "$sort", Value: bson.D{
 				{Key: "gym_name", Value: 1},
 				{Key: "username", Value: 1},
@@ -196,6 +200,10 @@ func (s *PassService) UsePassHandlerFunc() bot.HandlerFunc {
 	return func(ctx context.Context, b *bot.Bot, update *models.Update) {
 		collection := db.Collection("passes")
 		pipeline := mongo.Pipeline{
+			{{Key: "$match", Value: bson.D{
+				{Key: "qty", Value: bson.D{{Key: "$gt", Value: 0}}},
+			}}},
+
 			{{Key: "$group", Value: bson.D{
 				{Key: "_id", Value: "$gym_id"},
 			}}},
@@ -361,6 +369,7 @@ func (s *PassService) UseGymCallbackHandlerFunc() bot.HandlerFunc {
 		pipeline := mongo.Pipeline{
 			{{Key: "$match", Value: bson.D{
 				{Key: "gym_id", Value: gymObjID},
+				{Key: "qty", Value: bson.D{{Key: "$gt", Value: 0}}},
 			}}},
 
 			{{Key: "$lookup", Value: bson.D{
@@ -493,10 +502,6 @@ func (s *PassService) UsePassCallbackHandlerFunc() bot.HandlerFunc {
 			return
 		}
 
-		if updatedPass.Qty == 0 {
-			collection.DeleteOne(ctx, bson.M{"_id": updatedPass.ID})
-		}
-
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: update.CallbackQuery.Message.Message.Chat.ID,
 			Text:   fmt.Sprintf("1 pass used. %d remaining.", updatedPass.Qty),
@@ -583,6 +588,14 @@ func expiryStatus(expiryDate time.Time) string {
 		return "☠️"
 	}
 	return ""
+}
+
+func getMatchPipeline() mongo.Pipeline {
+	return mongo.Pipeline{
+		{{Key: "$match", Value: bson.D{
+			{Key: "qty", Value: bson.D{{Key: "$gt", Value: 0}}},
+		}}},
+	}
 }
 
 func getLookupPipeline() mongo.Pipeline {
