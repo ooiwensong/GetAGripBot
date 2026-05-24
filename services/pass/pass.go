@@ -187,10 +187,20 @@ func (s *PassService) PassByGymsHandlerFunc() bot.HandlerFunc {
 				fmt.Fprintf(&response, "    - %s (%d left) %s\n", pass.Owner, pass.Qty, emoji)
 			}
 		}
-		b.SendMessage(ctx, &bot.SendMessageParams{
+		fmt.Fprintf(&response, "\n\n<i>As of %s</i>", today().Format("02/01/2006"))
+
+		msg, _ := b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:    update.Message.Chat.ID,
 			Text:      response.String(),
 			ParseMode: models.ParseModeHTML,
+		})
+
+		b.UnpinAllChatMessages(ctx, &bot.UnpinAllChatMessagesParams{
+			ChatID: update.Message.Chat.ID,
+		})
+		b.PinChatMessage(ctx, &bot.PinChatMessageParams{
+			ChatID:    update.Message.Chat.ID,
+			MessageID: msg.ID,
 		})
 	}
 }
