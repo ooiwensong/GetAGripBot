@@ -513,7 +513,7 @@ func (s *PassService) UsePassCallbackHandlerFunc() bot.HandlerFunc {
 			return
 		}
 
-		_, err = collection.UpdateByID(ctx, pass.ID, pass)
+		_, err = collection.ReplaceOne(ctx, bson.M{"_id": passObjID}, pass)
 		if err != nil {
 			log.Printf("Error: %v", err)
 			b.SendMessage(ctx, &bot.SendMessageParams{
