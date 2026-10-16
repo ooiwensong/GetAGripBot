@@ -14,7 +14,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Pass struct {
@@ -477,13 +476,10 @@ func (s *PassService) UsePassCallbackHandlerFunc() bot.HandlerFunc {
 			return
 		}
 
+		var pass Pass
 		collection := db.Collection("passes")
-		result := collection.FindOneAndUpdate(
-			ctx,
-			bson.M{"_id": passObjID},
-			bson.M{"$inc": bson.M{"qty": -1}},
-			options.FindOneAndUpdate().SetReturnDocument(options.After),
-		)
+		result := collection.FindOne(ctx, bson.M{"_id": passObjID})
+
 		if result.Err() != nil {
 			log.Printf("Error: %v", result.Err())
 			if result.Err() == mongo.ErrNoDocuments {
@@ -492,18 +488,10 @@ func (s *PassService) UsePassCallbackHandlerFunc() bot.HandlerFunc {
 					Text:   "This pass is no longer available.",
 				})
 				return
-			} else {
-				log.Printf("Error updating pass quantity: %v", result.Err())
-				b.SendMessage(ctx, &bot.SendMessageParams{
-					ChatID: update.CallbackQuery.Message.Message.Chat.ID,
-					Text:   "Something went wrong, please try again later.",
-				})
-				return
 			}
 		}
 
-		var updatedPass Pass
-		if err := result.Decode(&updatedPass); err != nil {
+		if err := result.Decode(&pass); err != nil {
 			log.Printf("Error decoding updated pass: %v", err)
 			b.SendMessage(ctx, &bot.SendMessageParams{
 				ChatID: update.CallbackQuery.Message.Message.Chat.ID,
@@ -512,12 +500,40 @@ func (s *PassService) UsePassCallbackHandlerFunc() bot.HandlerFunc {
 			return
 		}
 
+		pass.Qty -= 1
+		if pass.Qty == 0 {
+			_, err := collection.DeleteOne(ctx, bson.M{"_id": passObjID})
+			if err != nil {
+				log.Printf("Error: %v", err)
+				b.SendMessage(ctx, &bot.SendMessageParams{
+					ChatID: update.CallbackQuery.Message.Message.Chat.ID,
+					Text:   "Something went wrong, please try again later.",
+				})
+			}
+			return
+		}
+
+		_, err = collection.UpdateByID(ctx, pass.ID, pass)
+		if err != nil {
+			log.Printf("Error: %v", err)
+			b.SendMessage(ctx, &bot.SendMessageParams{
+				ChatID: update.CallbackQuery.Message.Message.Chat.ID,
+				Text:   "Something went wrong, please try again later.",
+			})
+			return
+		}
+
+		displayName := update.CallbackQuery.From.Username
+		if displayName == '' {
+			displayName = update.CallbackQuery.From.FirstName
+		}
+
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: update.CallbackQuery.Message.Message.Chat.ID,
-			Text:   fmt.Sprintf("1 pass used. %d remaining.", updatedPass.Qty),
+			Text:   fmt.Sprintf("1 pass used by %s. %d remaining.", displayName, pass.Qty),
 		})
 
-		newTransaction := transaction.NewTransaction(transaction.Use, updatedPass.ID)
+		newTransaction := transaction.NewTransaction(transaction.Use, pass.ID)
 		newTransaction.Save(ctx, db)
 	}
 }
