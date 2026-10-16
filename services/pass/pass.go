@@ -510,17 +510,15 @@ func (s *PassService) UsePassCallbackHandlerFunc() bot.HandlerFunc {
 					Text:   "Something went wrong, please try again later.",
 				})
 			}
-			return
-		}
-
-		_, err = collection.ReplaceOne(ctx, bson.M{"_id": passObjID}, pass)
-		if err != nil {
-			log.Printf("Error: %v", err)
-			b.SendMessage(ctx, &bot.SendMessageParams{
-				ChatID: update.CallbackQuery.Message.Message.Chat.ID,
-				Text:   "Something went wrong, please try again later.",
-			})
-			return
+		} else {
+			_, err = collection.ReplaceOne(ctx, bson.M{"_id": passObjID}, pass)
+			if err != nil {
+				log.Printf("Error: %v", err)
+				b.SendMessage(ctx, &bot.SendMessageParams{
+					ChatID: update.CallbackQuery.Message.Message.Chat.ID,
+					Text:   "Something went wrong, please try again later.",
+				})
+			}
 		}
 
 		displayName := update.CallbackQuery.From.Username
