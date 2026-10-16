@@ -524,7 +524,7 @@ func (s *PassService) UsePassCallbackHandlerFunc() bot.HandlerFunc {
 		}
 
 		displayName := update.CallbackQuery.From.Username
-		if displayName == '' {
+		if displayName == "" {
 			displayName = update.CallbackQuery.From.FirstName
 		}
 
