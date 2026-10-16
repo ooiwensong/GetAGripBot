@@ -44,7 +44,7 @@ func (s *UndoService) UndoHandlerFunc() bot.HandlerFunc {
 		case Buy:
 			// Undo buy: delete the pass
 			collection := db.Collection("passes")
-			_, err = collection.DeleteOne(ctx, bson.M{"_id": lastTransaction.Payload})
+			_, err = collection.DeleteOne(ctx, bson.M{"_id": lastTransaction.Payload.ID})
 			if err != nil {
 				b.SendMessage(ctx, &bot.SendMessageParams{
 					ChatID: update.Message.Chat.ID,
@@ -60,7 +60,7 @@ func (s *UndoService) UndoHandlerFunc() bot.HandlerFunc {
 		case Use:
 			// Undo use: increase the pass count back
 			collection := db.Collection("passes")
-			_, err = collection.UpdateOne(ctx, bson.M{"_id": lastTransaction.Payload}, bson.M{"$inc": bson.M{"qty": 1}})
+			_, err = collection.UpdateOne(ctx, bson.M{"_id": lastTransaction.Payload.ID}, bson.M{"$inc": bson.M{"qty": 1}})
 			if err != nil {
 				b.SendMessage(ctx, &bot.SendMessageParams{
 					ChatID: update.Message.Chat.ID,
@@ -72,6 +72,25 @@ func (s *UndoService) UndoHandlerFunc() bot.HandlerFunc {
 			b.SendMessage(ctx, &bot.SendMessageParams{
 				ChatID: update.Message.Chat.ID,
 				Text:   "Use pass action undone.",
+			})
+		case Delete:
+			// Undo delete: restore the used up pass with Qty at 1
+			pass := lastTransaction.Payload
+			pass.Qty = 1
+
+			collection := db.Collection("passes")
+			_, err = collection.InsertOne(ctx, pass)
+			if err != nil {
+				b.SendMessage(ctx, &bot.SendMessageParams{
+					ChatID: update.Message.Chat.ID,
+					Text:   "Failed to undo the use/delete action. Try again later.",
+				})
+				return
+			}
+
+			b.SendMessage(ctx, &bot.SendMessageParams{
+				ChatID: update.Message.Chat.ID,
+				Text:   "Use/delete pass action undone.",
 			})
 		default:
 			b.SendMessage(ctx, &bot.SendMessageParams{

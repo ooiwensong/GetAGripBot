@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/ooiwensong/GetAGripBot/internal/passmodel"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -13,17 +14,18 @@ type Transaction struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty"`
 	Action    Action             `bson:"action,omitempty"`
 	CreatedAt time.Time          `bson:"created_at,omitempty"`
-	Payload   primitive.ObjectID `bson:"payload,omitempty"` // Payload can be the PassID for both buy and use actions
+	Payload   passmodel.Pass     `bson:"payload,omitempty"`
 }
 
 type Action string
 
 const (
-	Buy Action = "buy"
-	Use Action = "use"
+	Buy    Action = "buy"
+	Use    Action = "use"
+	Delete Action = "delete"
 )
 
-func NewTransaction(action Action, payload primitive.ObjectID) Transaction {
+func NewTransaction(action Action, payload passmodel.Pass) Transaction {
 	return Transaction{
 		Action:    action,
 		CreatedAt: time.Now(),

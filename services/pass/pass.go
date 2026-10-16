@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"github.com/ooiwensong/GetAGripBot/internal/passmodel"
 	"github.com/ooiwensong/GetAGripBot/services/gym"
 	"github.com/ooiwensong/GetAGripBot/services/transaction"
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,17 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type Pass struct {
-	ID            primitive.ObjectID `bson:"_id,omitempty"`
-	OwnerID       int64              `bson:"owner_id,omitempty"`
-	Owner         string             `bson:"owner,omitempty"`
-	GymID         primitive.ObjectID `bson:"gym_id,omitempty"`
-	GymName       string             `bson:"gym_name,omitempty"`
-	Cost          float64            `bson:"cost,omitempty"`
-	Qty           int8               `bson:"qty,omitempty"`
-	DatePurchased time.Time          `bson:"date_purchased,omitempty"`
-	DateExpiry    time.Time          `bson:"date_expiry,omitempty"`
-}
+type Pass = passmodel.Pass
 
 type PassesByOwner struct {
 	Owner  string `bson:"owner"`
@@ -510,6 +501,8 @@ func (s *PassService) UsePassCallbackHandlerFunc() bot.HandlerFunc {
 					Text:   "Something went wrong, please try again later.",
 				})
 			}
+			newTransaction := transaction.NewTransaction(transaction.Delete, pass)
+			newTransaction.Save(ctx, db)
 		} else {
 			_, err = collection.ReplaceOne(ctx, bson.M{"_id": passObjID}, pass)
 			if err != nil {
@@ -519,6 +512,8 @@ func (s *PassService) UsePassCallbackHandlerFunc() bot.HandlerFunc {
 					Text:   "Something went wrong, please try again later.",
 				})
 			}
+			newTransaction := transaction.NewTransaction(transaction.Use, pass)
+			newTransaction.Save(ctx, db)
 		}
 
 		displayName := update.CallbackQuery.From.Username
@@ -531,8 +526,6 @@ func (s *PassService) UsePassCallbackHandlerFunc() bot.HandlerFunc {
 			Text:   fmt.Sprintf("1 pass used by %s. %d remaining.", displayName, pass.Qty),
 		})
 
-		newTransaction := transaction.NewTransaction(transaction.Use, pass.ID)
-		newTransaction.Save(ctx, db)
 	}
 }
 
@@ -597,7 +590,7 @@ func (s *PassService) BuyPassCallbackHandlerFunc() bot.HandlerFunc {
 			Text:   fmt.Sprintf("Done! %s bought passes from %s", ownerUsername, gym.NameShort),
 		})
 
-		newTransaction := transaction.NewTransaction(transaction.Buy, passID)
+		newTransaction := transaction.NewTransaction(transaction.Buy, newPass)
 		newTransaction.Save(ctx, db)
 	}
 }
